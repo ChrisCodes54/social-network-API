@@ -14,7 +14,6 @@ const thoughtController = {
     // TODO: Your code
     Thought.findOne({_id: req.params.thoughtId}) 
     .select('-__v')
-      .populate('posts')
       .then((thoughts) =>
         !thoughts
           ? res.status(404).json({ message: 'No thought was found with that ID' })
@@ -87,7 +86,8 @@ const thoughtController = {
   // add a reaction to a thought
   addReaction(req, res) {
     //  TODO: add reaction to thought's reaction array
-    Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $addToSet: { reactions: req.params.reactionId } }, { new: true })
+    Thought.findOneAndUpdate({ _id: req.params.thoughtId }, 
+      { $addToSet: { reactions: req.body} }, { new: true })
     .then((dbThoughtData) => {
       if (!dbThoughtData) {
         return res.status(404).json({ message: 'No user with this id!' });
@@ -104,7 +104,18 @@ const thoughtController = {
   // remove reaction from a thought
   removeReaction(req, res) {
     // TODO: remove reaction from thoughts
-
+    Thought.findOneAndUpdate({_id: req.params.thoughtId},
+       {$pull: {reactions: {reactionId: req.params.reactionId}}}, {new: true})
+    .then((dbThoughtData) => {
+      if (!dbThoughtData) {
+        return res.status(404).json({ message: 'No user with this id!' });
+      }
+      res.json(dbThoughtData);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
   },
 };
 
