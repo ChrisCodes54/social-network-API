@@ -3,8 +3,21 @@ const { Schema, model } = require('mongoose');
 const userSchema = new Schema(
   {
     // TODO: create username field
-
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true
+    },
     // TODO: create email field
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: () => Promise.resolve(false),
+        message: 'Email validation failed'
+    },
     
     thoughts: [
       {
@@ -19,6 +32,7 @@ const userSchema = new Schema(
       },
     ],
   },
+
   {
     toJSON: {
       virtuals: true,
